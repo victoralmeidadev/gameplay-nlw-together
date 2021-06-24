@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { View, FlatList, Text } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
 import { ButtonAdd } from "../../components/ButtonAdd";
 import { Profile } from "../../components/Profile";
@@ -12,6 +13,7 @@ import { Background } from "../../components/Background";
 import { styles } from "./styles";
 
 export function Home() {
+  const navigation = useNavigation();
   const [category, setCategory] = useState("");
 
   const appointments = [
@@ -31,6 +33,13 @@ export function Home() {
     },
   ];
 
+  const handleAppointmentDetails = useCallback(() => {
+    navigation.navigate("AppointmentDetails");
+  }, [navigation]);
+  const handleAppointmentCreate = useCallback(() => {
+    navigation.navigate("AppointmentCreate");
+  }, [navigation]);
+
   const handleCategorySelect = useCallback(
     (categoryId: string) => {
       categoryId === category ? setCategory("") : setCategory(categoryId);
@@ -41,7 +50,7 @@ export function Home() {
     <Background>
       <View style={styles.header}>
         <Profile />
-        <ButtonAdd />
+        <ButtonAdd onPress={handleAppointmentCreate} />
       </View>
       <CategorySelect categorySelected={category} setCategory={handleCategorySelect} />
       <View style={styles.content}>
@@ -49,7 +58,7 @@ export function Home() {
         <FlatList
           data={appointments}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <Appointment data={item} />}
+          renderItem={({ item }) => <Appointment data={item} onPress={handleAppointmentDetails} />}
           ItemSeparatorComponent={() => <ListDivider />}
           style={styles.matches}
           showsVerticalScrollIndicator={false}
