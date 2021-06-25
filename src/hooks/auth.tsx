@@ -49,12 +49,11 @@ function AuthProvider({ children }: AuthProviderProps) {
         const [firstName] = userInfo.data.username.split(" ");
         userInfo.data.avatar = `${CDN_IMAGE}/avatars/${userInfo.data.id}/${userInfo.data.avatar}.png`;
         setUser({ ...userInfo.data, firstName, token: params.access_token });
-        setLoading(false);
-      } else {
-        setLoading(false);
       }
     } catch {
       throw new Error("Não foi possível autenticar");
+    } finally {
+      setLoading(false);
     }
   }
 
