@@ -5,7 +5,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { useAuth } from "../hooks/auth";
 
 import { SignIn } from "../screens/SignIn";
-import { AuthRoutes } from "./auth.routes";
+import { AuthRoutes } from "./app.routes";
 
 export function Routes() {
   const { user } = useAuth();
