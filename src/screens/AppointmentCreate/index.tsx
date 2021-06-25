@@ -34,13 +34,17 @@ export function AppointmentCreate() {
     setOpenGuildsModal(false);
   }, []);
 
+  const handleCategorySelect = useCallback((categoryId: string) => {
+    setCategory(categoryId);
+  }, []);
+
   return (
     <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
       <Background>
         <ScrollView>
           <Header title="Detalhes" />
           <Text style={[styles.label, { marginLeft: 24, marginTop: 36, marginBottom: 18 }]}>Categoria</Text>
-          <CategorySelect hasCheckBox setCategory={setCategory} categorySelected={category} />
+          <CategorySelect hasCheckBox setCategory={handleCategorySelect} categorySelected={category} />
           <View style={styles.form}>
             <RectButton onPress={handleOpenGuilds}>
               <View style={styles.select}>
