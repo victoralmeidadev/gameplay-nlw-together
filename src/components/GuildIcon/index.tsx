@@ -1,9 +1,6 @@
 import React from "react";
 import { Image } from "react-native";
-import { RectButton, RectButtonProps } from "react-native-gesture-handler";
 import { styles } from "./styles";
-
-import DiscordImg from "../../assets/discord.png";
 
 export function GuildIcon() {
   return (
