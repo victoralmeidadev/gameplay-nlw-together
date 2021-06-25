@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "gameplay",
-    "slug": "gameplay",
+    "name": "gameplay-nlw-vk",
+    "slug": "gameplay-nlw-vk",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -13,7 +13,9 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true
     },
@@ -25,6 +27,8 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "description": "Projeto criado durante NLW Together da RocketSeat. Tem como objetivo integração com discord e agendamento de partidas entre amigos.\n\n",
+    "githubUrl": "https://github.com/victoralmeidadev/gameplay-nlw-together"
   }
 }
