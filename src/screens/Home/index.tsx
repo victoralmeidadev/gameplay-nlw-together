@@ -70,11 +70,6 @@ export function Home() {
     setSigningOut(false);
   }, []);
 
-  const handleSignOut = useCallback(async () => {
-    await signOut();
-    setSigningOut(false);
-  }, []);
-
   return (
     <Background>
       <View style={styles.header}>
@@ -108,7 +103,7 @@ export function Home() {
             <TouchableOpacity style={styles.cancelButton} activeOpacity={0.7} onPress={handleCancelSignOut}>
               <Text style={styles.buttonText}>Não</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.confirmButton} activeOpacity={0.7} onPress={handleSignOut}>
+            <TouchableOpacity style={styles.confirmButton} activeOpacity={0.7} onPress={signOut}>
               <Text style={styles.buttonText}>Sim</Text>
             </TouchableOpacity>
           </View>
