@@ -1,41 +1,38 @@
 import React, { useCallback, useState } from "react";
-import { View, FlatList, Text } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { View, FlatList, Text, TouchableOpacity } from "react-native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import { ButtonAdd } from "../../components/ButtonAdd";
-import { Profile } from "../../components/Profile";
+import { useAuth } from "../../hooks/auth";
+
+import { COLLECTION_APPOINTMENTS } from "../../configs";
+
+import { Appointment, AppointmentProps } from "../../components/Appointment";
 import { CategorySelect } from "../../components/CategorySelect";
-import { ListHeader } from "../../components/ListHeader";
-import { Appointment } from "../../components/Appointment";
 import { ListDivider } from "../../components/ListDivider";
 import { Background } from "../../components/Background";
+import { ListHeader } from "../../components/ListHeader";
+import { ModalSignout } from "../../components/ModalSignout";
+import { ButtonAdd } from "../../components/ButtonAdd";
+import { Profile } from "../../components/Profile";
+import { Load } from "../../components/Load";
 
 import { styles } from "./styles";
 
 export function Home() {
   const navigation = useNavigation();
+  const { signOut } = useAuth();
   const [category, setCategory] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [signingOut, setSigningOut] = useState(false);
+  const [appointments, setAppointments] = useState<AppointmentProps[]>([]);
 
-  const appointments = [
-    {
-      id: "1",
-      guild: { id: "1", name: "Wakanda", icon: null, owner: true },
-      category: "1",
-      date: "22/06 as 20:40",
-      description: "É hoje que vamos chegar ao challenger sem perder uma partida da md10",
+  const handleAppointmentDetails = useCallback(
+    (guildSelected: AppointmentProps) => {
+      navigation.navigate("AppointmentDetails", { guildSelected });
     },
-    {
-      id: "2",
-      guild: { id: "1", name: "Wakanda", icon: null, owner: true },
-      category: "1",
-      date: "22/06 as 20:40",
-      description: "É hoje que vamos chegar ao challenger sem perder uma partida da md10",
-    },
-  ];
-
-  const handleAppointmentDetails = useCallback(() => {
-    navigation.navigate("AppointmentDetails");
-  }, [navigation]);
+    [navigation]
+  );
   const handleAppointmentCreate = useCallback(() => {
     navigation.navigate("AppointmentCreate");
   }, [navigation]);
@@ -46,23 +43,77 @@ export function Home() {
     },
     [category]
   );
+
+  const loadAppointments = useCallback(async () => {
+    const response = await AsyncStorage.getItem(COLLECTION_APPOINTMENTS);
+    const storage: AppointmentProps[] = response ? JSON.parse(response) : [];
+    if (category) {
+      setAppointments(storage.filter((item) => item.category === category));
+    } else {
+      setAppointments(storage);
+    }
+
+    setLoading(false);
+  }, [category]);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadAppointments();
+    }, [category])
+  );
+
+  const handleShowSignOut = useCallback(() => {
+    setSigningOut(true);
+  }, []);
+
+  const handleCancelSignOut = useCallback(() => {
+    setSigningOut(false);
+  }, []);
+
+  const handleSignOut = useCallback(async () => {
+    await signOut();
+    setSigningOut(false);
+  }, []);
+
   return (
     <Background>
       <View style={styles.header}>
-        <Profile />
+        <Profile handleShowSignOut={handleShowSignOut} />
         <ButtonAdd onPress={handleAppointmentCreate} />
       </View>
       <CategorySelect categorySelected={category} setCategory={handleCategorySelect} />
-      <ListHeader title="Partidas agendadas" subtitle="Total 6" />
-      <FlatList
-        data={appointments}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <Appointment data={item} onPress={handleAppointmentDetails} />}
-        ItemSeparatorComponent={() => <ListDivider />}
-        contentContainerStyle={{ paddingBottom: 69 }}
-        style={styles.matches}
-        showsVerticalScrollIndicator={false}
-      />
+      {loading ? (
+        <Load />
+      ) : (
+        <>
+          <ListHeader title="Partidas agendadas" subtitle={`Total ${appointments.length}`} />
+
+          <FlatList
+            data={appointments}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => <Appointment data={item} onPress={() => handleAppointmentDetails(item)} />}
+            ItemSeparatorComponent={() => <ListDivider />}
+            contentContainerStyle={{ paddingBottom: 69 }}
+            style={styles.matches}
+            showsVerticalScrollIndicator={false}
+          />
+        </>
+      )}
+      <ModalSignout visible={signingOut} closeModal={handleCancelSignOut}>
+        <View style={styles.signoutWrapper}>
+          <Text style={styles.signoutMessage}>
+            Deseja sair do Game<Text style={styles.signoutMessagePrimary}>Play</Text>?
+          </Text>
+          <View style={styles.signoutButtonsWrapper}>
+            <TouchableOpacity style={styles.cancelButton} activeOpacity={0.7} onPress={handleCancelSignOut}>
+              <Text style={styles.buttonText}>Não</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.confirmButton} activeOpacity={0.7} onPress={handleSignOut}>
+              <Text style={styles.buttonText}>Sim</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ModalSignout>
     </Background>
   );
 }
